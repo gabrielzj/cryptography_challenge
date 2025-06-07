@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from .models import User
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'userDocument', 'creditCardToken', 'value']
+        # campos que estarão no response
+        fields = '__all__'
         read_only_fields = ['id', 'createdAt', 'updatedAt']
     
     # nova instância de objeto usuário

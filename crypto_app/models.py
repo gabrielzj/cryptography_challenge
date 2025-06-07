@@ -8,6 +8,9 @@ class User(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
     
+    #auto_now_add cria o campo com a data e hora atual quando o objeto é criado
+    #auto_now atualiza o campo com a data e hora atual sempre que o objeto é salvo
+    
 class Meta:
     db_table = "user"
     verbose_name = "Usuários"

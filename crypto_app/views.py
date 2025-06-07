@@ -1,46 +1,62 @@
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import View
 from .models import User
-from rest_framework.generics import (CreateAPIView, ListAPIView, RetrieveAPIView,
-                                    UpdateAPIView, DestroyAPIView)
-from .serializers import UserCreateSerializer
-from django.db import transaction
+from rest_framework.decorators import api_view
+from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 
 class IndexView(View):
     def get(self, request):
         return HttpResponse("You're at the crypto app index.")
+
+# data = request.data  -> POST
+# user, many=True -> GET
+
+@api_view(['POST'])
+def create_user(request):
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def list_user(request):
+    try:
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def retrieve_user(request, pk):
+    try:
+        queryset = User.objects.get(pk=pk)
+        # get_object_or_404(queryset)
+        serializer = UserSerializer(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
+@api_view(['PUT', 'PATCH'])
+def update_user(request, pk):
+    try:
+        queryset = User.objects.get(pk=pk)
+        serializer = UserSerializer(instance=queryset, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
-# cria objetos
-# usa a função create (interna) do CreateAPIView para criar um novo usuário
-class CreateUserView(CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserCreateSerializer
+@api_view(['DELETE'])
+def delete_user(request, pk):
+    try:
+        queryset = User.objects.get(pk=pk)
+        queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    # @transaction.atomic    
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        
-
-# lista objetos    
-class ListUserView(ListAPIView):
-    pass
-
-# recupera objeto específico
-class RetrieveUserView(RetrieveAPIView):
-    pass
-
-# atualiza objeto
-class UpdateUserView(UpdateAPIView):
-    pass
-
-# deleta objeto
-class DeleteUserView(DestroyAPIView):
-    pass
