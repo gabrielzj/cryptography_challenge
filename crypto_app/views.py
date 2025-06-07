@@ -6,9 +6,8 @@ from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 
-class IndexView(View):
-    def get(self, request):
-        return HttpResponse("You're at the crypto app index.")
+def index(request):
+    return HttpResponse("index page")
 
 # data = request.data  -> POST
 # user, many=True -> GET
