@@ -1,5 +1,4 @@
 from django.http import HttpResponse
-from django.views import View
 from .models import User
 from rest_framework.decorators import api_view
 from .serializers import UserSerializer
