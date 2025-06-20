@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+
 urlpatterns = [
     path("", views.index, name='index'), # as_view() linka uma classe de view a uma URL
     path("users/create", views.create_user, name='create_user'),
