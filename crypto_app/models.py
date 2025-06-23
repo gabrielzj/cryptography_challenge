@@ -11,6 +11,9 @@ class User(models.Model):
     #auto_now_add cria o campo com a data e hora atual quando o objeto é criado
     #auto_now atualiza o campo com a data e hora atual sempre que o objeto é salvo
     
+    def __str__(self):
+        return self.id
+    
 class Meta:
     db_table = "user"
     verbose_name = "Usuários"
