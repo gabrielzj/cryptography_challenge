@@ -12,7 +12,6 @@ crypt_service = CryptoService()
 def index():
     return HttpResponse("index page")
 
-#TODO: ver de colocar criptografia no serializer
 @api_view(['POST'])
 def create_user(request):
     try:
@@ -47,7 +46,6 @@ def retrieve_user(request, pk):
 def update_user(request, pk):
     try:
         queryset = User.objects.get(pk=pk)
-        # partial = request.method == 'PATCH'
         if request.method == 'PATCH':
             serializer = UserSerializer(queryset, data=request.data, partial=True)
         elif request.method == 'PUT':

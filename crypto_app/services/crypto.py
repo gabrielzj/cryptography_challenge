@@ -12,7 +12,6 @@ class CryptoService:
         self.fernet = Fernet(key)
         
     def cryptography(self, data: bytes) -> bytes:
-        # Garantir que data seja bytes
         if isinstance(data, str):
             data = data.encode('utf-8')
         elif not isinstance(data, bytes):
@@ -24,15 +23,14 @@ class CryptoService:
     
     def decryptography(self, token):
         try:
-            # Se for uma string, precisamos transformar em bytes
+            # Se for uma string, transforma pra bytes
             if isinstance(token, str):
                 if token.startswith("b'") or token.startswith('b"'):
-                    # É uma representação string de bytes, converta para bytes reais
+                    # É uma representação string de bytes, converte para tipo de bytes reais
                     token = ast.literal_eval(token)
                 else:
                     # É uma string normal, codifique em bytes
                     token = token.encode('utf-8')
-            # O Fernet.decrypt espera bytes
             plain_text = self.fernet.decrypt(token)
             # Retorna o texto decodificado como string
             return plain_text.decode('utf-8')
