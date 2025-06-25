@@ -24,15 +24,18 @@ class CryptoService:
     
     def decryptography(self, token):
         try:
-            if isinstance(token, str) and token.startswith("b'"):
-                token = ast.literal_eval(token).decode('utf-8')
-            
+            # Se for uma string, precisamos transformar em bytes
+            if isinstance(token, str):
+                if token.startswith("b'") or token.startswith('b"'):
+                    # É uma representação string de bytes, converta para bytes reais
+                    token = ast.literal_eval(token)
+                else:
+                    # É uma string normal, codifique em bytes
+                    token = token.encode('utf-8')
+            # O Fernet.decrypt espera bytes
             plain_text = self.fernet.decrypt(token)
-            
-            # token.encode('utf-8') -> pega string e transforma pra bytes
-            # self.fernet.decrypt() -> retorna dados em bytes
-            return plain_text
+            # Retorna o texto decodificado como string
+            return plain_text.decode('utf-8')
         except Exception as e:
             print(f"Erro na descriptografia: {e}", token)
             return f'Erro de descriptografia: {str(e)}'
-        # return self.fernet.decrypt(token).decode('utf-8')
