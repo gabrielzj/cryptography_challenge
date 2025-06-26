@@ -4,54 +4,54 @@ from .services.crypto import CryptoService
 
 crypt_service = CryptoService()
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):    
     class Meta:
         model = User
         # campos que estarão no response
         fields = '__all__'
         read_only_fields = ['id', 'createdAt', 'updatedAt']
     
-    def to_internal_value(self, data):
-        int_value = super().to_internal_value(data)
-        try:
-            # Criptografa dados sensíveis
-            if 'userDocument' in int_value:
-                int_value['userDocument'] = crypt_service.cryptography(int_value['userDocument'])
-            if 'creditCardToken' in int_value:
-                int_value['creditCardToken'] = crypt_service.cryptography(int_value['creditCardToken'])
-        except Exception as e:
-            int_value['userDocument'] = 'Erro de criptografia do serializer'
-            int_value['creditCardToken'] = 'Erro de criptografia do serializer'
-            print(f"Criptografia: {e}")
-        return int_value
-    
     # nova instância de objeto usuário
     def create(self, validated_data):
-        # ocorre após to_internal_value
-        user = User(
-            userDocument = validated_data['userDocument'],
-            creditCardToken = validated_data['creditCardToken'],
-            value = validated_data['value']
-        )
-        user.save()
-        return user
-    
+        try:
+            validated_data['userDocument'] = crypt_service.cryptography(validated_data['userDocument'])
+            validated_data['creditCardToken'] = crypt_service.cryptography(validated_data['creditCardToken'])
+        except Exception as e:
+            validated_data['userDocument'] = 'Erro de criptografia do serializer'
+            validated_data['creditCardToken'] = 'Erro de criptografia do serializer'
+            print(f"Criptografia: {e}")
+        return User.objects.create(**validated_data)
+        
     # JSON de saída
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         try:
             # Verifica se os campos existem antes de tentar descriptografá-los
-            if hasattr(instance, 'userDocument') and instance.userDocument:
-                rep['userDocument'] = crypt_service.decryptography(instance.userDocument)
-            if hasattr(instance, 'creditCardToken') and instance.creditCardToken:
-                rep['creditCardToken'] = crypt_service.decryptography(instance.creditCardToken)
+            rep['userDocument'] = crypt_service.decryptography(instance.userDocument)
+            rep['creditCardToken'] = crypt_service.decryptography(instance.creditCardToken)
         except Exception as e:
             rep['userDocument'] = 'Erro de descriptografia do serializer'
             rep['creditCardToken'] = 'Erro de descriptografia do serializer'
             print(f"[Descriptografia erro]: {e}")
         return rep
     
-    def update(self, instance, validated_data):        
+    def update(self, instance, validated_data):
+        try:
+            if 'userDocument' in validated_data:
+                validated_data['userDocument'] = crypt_service.cryptography(validated_data['userDocument'])
+            
+            if 'creditCardToken' in validated_data:
+                validated_data['creditCardToken'] = crypt_service.cryptography(validated_data['creditCardToken'])        
+        
+        except Exception as e:
+            if 'userDocument' in validated_data:
+                validated_data['userDocument'] = 'Erro de criptografia na atualização'
+            
+            if 'creditCardToken' in validated_data:
+                validated_data['creditCardToken'] = 'Erro de criptografia na atualização'
+            
+            print(f"[Criptografia update erro]: {e}")
+            
         instance.userDocument = validated_data.get('userDocument', instance.userDocument)
         instance.creditCardToken = validated_data.get('creditCardToken', instance.creditCardToken)
         instance.value = validated_data.get('value', instance.value)
