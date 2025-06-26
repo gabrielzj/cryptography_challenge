@@ -27,9 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     # nova instância de objeto usuário
     def create(self, validated_data):
-        # Os dados já foram criptografados no método to_internal_value
-        # Apenas cria o usuário com os dados validados
-        # user = User.objects.create(**validated_data)
+        # ocorre após to_internal_value
         user = User(
             userDocument = validated_data['userDocument'],
             creditCardToken = validated_data['creditCardToken'],
@@ -53,15 +51,10 @@ class UserSerializer(serializers.ModelSerializer):
             print(f"[Descriptografia erro]: {e}")
         return rep
     
-    def update(self, instance, validated_data):
-        
-        userDocument = serializers.CharField()
-        creditCardToken = serializers.CharField()
-        value = serializers.DecimalField(max_digits=10, decimal_places=2)
-        
-        instance.userDocument = validated_data.get('userDocument', userDocument)
-        instance.creditCardToken = validated_data.get('creditCardToken', creditCardToken)
-        instance.value = validated_data.get('value', value)
+    def update(self, instance, validated_data):        
+        instance.userDocument = validated_data.get('userDocument', instance.userDocument)
+        instance.creditCardToken = validated_data.get('creditCardToken', instance.creditCardToken)
+        instance.value = validated_data.get('value', instance.value)
         instance.save()
         return instance
             

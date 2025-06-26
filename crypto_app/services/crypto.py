@@ -23,7 +23,6 @@ class CryptoService:
     
     def decryptography(self, token):
         try:
-            # Se for uma string, transforma pra bytes
             if isinstance(token, str):
                 if token.startswith("b'") or token.startswith('b"'):
                     # É uma representação string de bytes, converte para tipo de bytes reais
