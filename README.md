@@ -1,11 +1,11 @@
 ## :trophy: Challenge proposed by [Back-End Brasil](https://github.com/backend-br)
 Link: https://github.com/backend-br/desafios/tree/master/cryptography
 ## 💻 Technologies:
-Python
-Django
-Django Rest Framework
-Cryptography Library (Symmetric encryption using Fernet)
-SQLite3
+- Python
+- Django
+- Django Rest Framework
+- Cryptography Library (Symmetric encryption using Fernet)
+- SQLite3
 
 ## ❕ About:
 REST API with CRUD operations for user information. The document and credit card token are encrypted before being stored in the database and decrypted when retrieved.
